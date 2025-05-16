@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/sonner";
-import { Spider } from "lucide-react";
+import { Search } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -63,7 +63,7 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-2">
-            <Spider className="h-12 w-12 text-spider-primary" />
+            <Search className="h-12 w-12 text-spider-primary" />
           </div>
           <h1 className="text-3xl font-bold text-spider-primary">Arachnodex</h1>
           <p className="text-gray-600 mt-2">Track and document your spider encounters</p>

@@ -21,22 +21,26 @@ const EncounterDetails = () => {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      const encounterData = getEncounterById(id);
-      if (encounterData) {
-        setEncounter(encounterData);
-        
-        const spiderData = getSpiderById(encounterData.spiderId);
-        if (spiderData) {
-          setSpider(spiderData);
+    const fetchEncounter = async () => {
+      if (id) {
+        const encounterData = await getEncounterById(id);
+        if (encounterData) {
+          setEncounter(encounterData);
+          
+          const spiderData = getSpiderById(encounterData.spiderId);
+          if (spiderData) {
+            setSpider(spiderData);
+          }
         }
       }
-    }
+    };
+    
+    fetchEncounter();
   }, [id]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (id) {
-      deleteEncounter(id);
+      await deleteEncounter(id);
       toast.success("Encounter deleted successfully");
       navigate("/encounters");
     }

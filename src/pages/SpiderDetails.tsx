@@ -17,14 +17,18 @@ const SpiderDetails = () => {
   const [encounters, setEncounters] = useState<Encounter[]>([]);
 
   useEffect(() => {
-    if (id) {
-      const spiderData = getSpiderById(Number(id));
-      if (spiderData) {
-        setSpider(spiderData);
-        const spiderEncounters = getEncountersBySpiderId(Number(id));
-        setEncounters(spiderEncounters);
+    const fetchData = async () => {
+      if (id) {
+        const spiderData = getSpiderById(Number(id));
+        if (spiderData) {
+          setSpider(spiderData);
+          const spiderEncounters = await getEncountersBySpiderId(Number(id));
+          setEncounters(spiderEncounters);
+        }
       }
-    }
+    };
+    
+    fetchData();
   }, [id]);
 
   // Define the color of the danger badge based on the danger level

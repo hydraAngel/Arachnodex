@@ -120,7 +120,7 @@ export const getEncounterById = async (id: string): Promise<Encounter | undefine
           spiderId: data.spider_id,
           date: new Date(data.date),
           location: data.location,
-          coordinates: data.coordinates,
+          coordinates: data.coordinates as { latitude: number; longitude: number } | undefined,
           companions: data.companions || [],
           notes: data.notes || '',
           photos: data.photos || [],

@@ -18,8 +18,12 @@ const NavBar = () => {
   const { user, signOut } = useAuth();
   
   useEffect(() => {
-    const encounters = getAllEncounters();
-    setEncounterCount(encounters.length);
+    const fetchEncounters = async () => {
+      const encounters = await getAllEncounters();
+      setEncounterCount(encounters.length);
+    };
+    
+    fetchEncounters();
   }, []);
 
   const handleSignOut = async () => {

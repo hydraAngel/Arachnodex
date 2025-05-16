@@ -15,24 +15,28 @@ const Index = () => {
   const [totalEncounters, setTotalEncounters] = useState<number>(0);
 
   useEffect(() => {
-    const encounters = getAllEncounters();
-    setTotalEncounters(encounters.length);
+    const fetchEncounters = async () => {
+      const encounters = await getAllEncounters();
+      setTotalEncounters(encounters.length);
 
-    // Get unique spider IDs
-    const uniqueSpiderIds = new Set(encounters.map(e => e.spiderId));
-    setUniqueSpecies(uniqueSpiderIds.size);
+      // Get unique spider IDs
+      const uniqueSpiderIds = new Set(encounters.map(e => e.spiderId));
+      setUniqueSpecies(uniqueSpiderIds.size);
 
-    // Get most recent encounters
-    const sortedEncounters = [...encounters].sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+      // Get most recent encounters
+      const sortedEncounters = [...encounters].sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
 
-    const recent = sortedEncounters.slice(0, 3).map(e => ({
-      date: e.date,
-      spider: getSpiderById(e.spiderId)
-    }));
+      const recent = sortedEncounters.slice(0, 3).map(e => ({
+        date: e.date,
+        spider: getSpiderById(e.spiderId)
+      }));
 
-    setRecentEncounters(recent);
+      setRecentEncounters(recent);
+    };
+    
+    fetchEncounters();
   }, []);
 
   return (
