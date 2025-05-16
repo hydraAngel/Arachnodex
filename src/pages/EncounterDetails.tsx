@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { format } from "date-fns";
-import { CalendarIcon, MapPin, User, Trash2 } from "lucide-react";
+import { CalendarIcon, MapPin, User, Trash2, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 
 const EncounterDetails = () => {
@@ -23,14 +23,18 @@ const EncounterDetails = () => {
   useEffect(() => {
     const fetchEncounter = async () => {
       if (id) {
-        const encounterData = await getEncounterById(id);
-        if (encounterData) {
-          setEncounter(encounterData);
-          
-          const spiderData = getSpiderById(encounterData.spiderId);
-          if (spiderData) {
-            setSpider(spiderData);
+        try {
+          const encounterData = await getEncounterById(id);
+          if (encounterData) {
+            setEncounter(encounterData);
+            
+            const spiderData = getSpiderById(encounterData.spiderId);
+            if (spiderData) {
+              setSpider(spiderData);
+            }
           }
+        } catch (error) {
+          console.error("Error fetching encounter:", error);
         }
       }
     };
@@ -67,51 +71,55 @@ const EncounterDetails = () => {
     <div className="min-h-screen bg-spider-background">
       <NavBar />
       
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
+      <main className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Spider Info */}
-          <div className="md:w-1/3">
+          <div className="w-full lg:w-1/3 order-2 lg:order-1">
             <Card className="overflow-hidden">
-              <div className="h-56 overflow-hidden">
+              <div className="h-48 sm:h-56 overflow-hidden">
                 <img 
                   src={spider.imageUrl} 
                   alt={spider.commonName} 
                   className="w-full h-full object-cover"
                 />
               </div>
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-semibold mb-1">{spider.commonName}</h2>
+              <CardContent className="p-4 sm:p-6">
+                <h2 className="text-xl font-semibold mb-1">{spider.commonName}</h2>
                 <p className="text-sm italic text-gray-600 mb-4">{spider.scientificName}</p>
                 
-                <Button 
-                  onClick={() => navigate(`/spider/${spider.id}`)}
-                  className="w-full mb-2 bg-spider-primary hover:bg-spider-secondary"
-                >
-                  View Spider Details
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate(`/log-encounter/${spider.id}`)}
-                  className="w-full text-spider-primary border-spider-primary"
-                >
-                  Log New Encounter
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <Button 
+                    onClick={() => navigate(`/spider/${spider.id}`)}
+                    className="flex-1 bg-spider-primary hover:bg-spider-secondary"
+                  >
+                    Spider Details
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => navigate(`/log-encounter/${spider.id}`)}
+                    className="flex-1 text-spider-primary border-spider-primary"
+                  >
+                    New Encounter
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
           
           {/* Encounter Details */}
-          <div className="md:w-2/3">
+          <div className="w-full lg:w-2/3 order-1 lg:order-2">
             <div className="flex items-center mb-4 justify-between">
               <div className="flex items-center">
                 <Button 
                   variant="outline" 
                   onClick={() => navigate('/encounters')} 
                   className="mr-2"
+                  size="sm"
                 >
-                  Back to Encounters
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Back
                 </Button>
-                <h1 className="text-3xl font-bold text-spider-primary">Encounter Details</h1>
+                <h1 className="text-xl sm:text-3xl font-bold text-spider-primary">Encounter Details</h1>
               </div>
               <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
                 <DialogTrigger asChild>
@@ -126,22 +134,22 @@ const EncounterDetails = () => {
                       Are you sure you want to delete this encounter? This action cannot be undone.
                     </DialogDescription>
                   </DialogHeader>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setConfirmDelete(false)}>Cancel</Button>
-                    <Button variant="destructive" onClick={handleDelete}>Delete</Button>
+                  <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2 sm:gap-2">
+                    <Button variant="outline" onClick={() => setConfirmDelete(false)} className="sm:order-1">Cancel</Button>
+                    <Button variant="destructive" onClick={handleDelete} className="sm:order-2">Delete</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
             </div>
             
             <Card className="mb-6">
-              <CardContent className="p-6 space-y-6">
-                <div className="grid gap-6 md:grid-cols-2">
+              <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
                   <div>
                     <div className="text-sm font-medium text-gray-500 mb-1">When</div>
                     <div className="flex items-center">
                       <CalendarIcon className="h-5 w-5 mr-2 text-spider-primary" />
-                      <span className="text-lg">{format(encounter.date, "PPPP")}</span>
+                      <span className="text-base sm:text-lg">{format(new Date(encounter.date), "PPP")}</span>
                     </div>
                   </div>
                   
@@ -149,12 +157,12 @@ const EncounterDetails = () => {
                     <div className="text-sm font-medium text-gray-500 mb-1">Where</div>
                     <div className="flex items-center">
                       <MapPin className="h-5 w-5 mr-2 text-spider-primary" />
-                      <span className="text-lg">{encounter.location}</span>
+                      <span className="text-base sm:text-lg break-words">{encounter.location}</span>
                     </div>
                   </div>
                 </div>
                 
-                {encounter.companions.length > 0 && (
+                {encounter.companions && encounter.companions.length > 0 && (
                   <div>
                     <div className="text-sm font-medium text-gray-500 mb-1">With Who</div>
                     <div className="flex items-center">
@@ -171,7 +179,7 @@ const EncounterDetails = () => {
                 {encounter.notes && (
                   <div>
                     <div className="text-sm font-medium text-gray-500 mb-1">Notes</div>
-                    <div className="bg-gray-50 p-4 rounded-md">
+                    <div className="bg-gray-50 p-3 sm:p-4 rounded-md text-sm sm:text-base">
                       {encounter.notes}
                     </div>
                   </div>

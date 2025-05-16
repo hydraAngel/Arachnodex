@@ -16,24 +16,28 @@ const Index = () => {
 
   useEffect(() => {
     const fetchEncounters = async () => {
-      const encounters = await getAllEncounters();
-      setTotalEncounters(encounters.length);
+      try {
+        const encounters = await getAllEncounters();
+        setTotalEncounters(encounters.length);
 
-      // Get unique spider IDs
-      const uniqueSpiderIds = new Set(encounters.map(e => e.spiderId));
-      setUniqueSpecies(uniqueSpiderIds.size);
+        // Get unique spider IDs
+        const uniqueSpiderIds = new Set(encounters.map(e => e.spiderId));
+        setUniqueSpecies(uniqueSpiderIds.size);
 
-      // Get most recent encounters
-      const sortedEncounters = [...encounters].sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
+        // Get most recent encounters
+        const sortedEncounters = [...encounters].sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
 
-      const recent = sortedEncounters.slice(0, 3).map(e => ({
-        date: e.date,
-        spider: getSpiderById(e.spiderId)
-      }));
+        const recent = sortedEncounters.slice(0, 3).map(e => ({
+          date: e.date,
+          spider: getSpiderById(e.spiderId)
+        }));
 
-      setRecentEncounters(recent);
+        setRecentEncounters(recent);
+      } catch (error) {
+        console.error("Error fetching encounters:", error);
+      }
     };
     
     fetchEncounters();
@@ -43,26 +47,26 @@ const Index = () => {
     <div className="min-h-screen bg-spider-background web-pattern">
       <NavBar />
       
-      <main className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-spider-primary mb-2">
+      <main className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl font-bold text-spider-primary mb-2">
             Welcome to Arachnodex
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-base sm:text-lg text-gray-600">
             Track and document your spider encounters like a professional arachnologist!
           </p>
         </div>
         
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-10">
           <Card className="bg-white shadow-md hover:shadow-lg transition-shadow">
             <CardHeader className="pb-2">
-              <CardTitle className="text-center text-2xl text-spider-primary">
+              <CardTitle className="text-center text-xl sm:text-2xl text-spider-primary">
                 Species Discovered
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-4xl font-bold text-center">{uniqueSpecies}</p>
+              <p className="text-3xl sm:text-4xl font-bold text-center">{uniqueSpecies}</p>
             </CardContent>
             <CardFooter>
               <Button onClick={() => navigate('/database')} className="w-full bg-spider-primary hover:bg-spider-secondary">
@@ -73,12 +77,12 @@ const Index = () => {
           
           <Card className="bg-white shadow-md hover:shadow-lg transition-shadow">
             <CardHeader className="pb-2">
-              <CardTitle className="text-center text-2xl text-spider-primary">
+              <CardTitle className="text-center text-xl sm:text-2xl text-spider-primary">
                 Total Encounters
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <p className="text-4xl font-bold text-center">{totalEncounters}</p>
+              <p className="text-3xl sm:text-4xl font-bold text-center">{totalEncounters}</p>
             </CardContent>
             <CardFooter>
               <Button onClick={() => navigate('/encounters')} className="w-full bg-spider-primary hover:bg-spider-secondary">
@@ -87,9 +91,9 @@ const Index = () => {
             </CardFooter>
           </Card>
           
-          <Card className="bg-white shadow-md hover:shadow-lg transition-shadow">
+          <Card className="bg-white shadow-md hover:shadow-lg transition-shadow sm:col-span-2 md:col-span-1">
             <CardHeader className="pb-2">
-              <CardTitle className="text-center text-2xl text-spider-primary">
+              <CardTitle className="text-center text-xl sm:text-2xl text-spider-primary">
                 Log New Encounter
               </CardTitle>
             </CardHeader>
@@ -105,14 +109,14 @@ const Index = () => {
         </div>
         
         {/* Recent Encounters Section */}
-        <h2 className="text-2xl font-semibold text-spider-primary mb-4">Recent Sightings</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold text-spider-primary mb-4">Recent Sightings</h2>
         
         {recentEncounters.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {recentEncounters.map((item, index) => (
               <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer" 
                 onClick={() => item.spider && navigate(`/spider/${item.spider.id}`)}>
-                <div className="h-40 overflow-hidden">
+                <div className="h-32 sm:h-40 overflow-hidden">
                   {item.spider && (
                     <img 
                       src={item.spider.imageUrl} 
@@ -126,15 +130,15 @@ const Index = () => {
                     {item.spider ? item.spider.commonName : "Unknown Spider"}
                   </h3>
                   <p className="text-sm text-gray-600">
-                    Spotted: {item.date.toLocaleDateString()}
+                    Spotted: {new Date(item.date).toLocaleDateString()}
                   </p>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : (
-          <div className="text-center p-8 border border-dashed border-gray-300 rounded-lg">
-            <p className="text-lg text-gray-500">No encounters logged yet</p>
+          <div className="text-center p-6 sm:p-8 border border-dashed border-gray-300 rounded-lg">
+            <p className="text-base sm:text-lg text-gray-500">No encounters logged yet</p>
             <Button 
               onClick={() => navigate('/database')} 
               className="mt-4 bg-spider-primary hover:bg-spider-secondary"
@@ -145,10 +149,10 @@ const Index = () => {
         )}
       </main>
       
-      <footer className="bg-spider-primary text-white p-6 mt-10">
+      <footer className="bg-spider-primary text-white p-4 sm:p-6 mt-6 sm:mt-10">
         <div className="container mx-auto text-center">
           <p>Arachnodex: Your Personal Spider Tracking App</p>
-          <p className="text-sm mt-2">
+          <p className="text-xs sm:text-sm mt-2">
             &copy; {new Date().getFullYear()} - All spider data is for educational purposes
           </p>
         </div>

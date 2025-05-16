@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import EncounterCard from "@/components/EncounterCard";
+import { ChevronLeft } from "lucide-react";
 
 const SpiderDetails = () => {
   const { id } = useParams();
@@ -22,8 +23,12 @@ const SpiderDetails = () => {
         const spiderData = getSpiderById(Number(id));
         if (spiderData) {
           setSpider(spiderData);
-          const spiderEncounters = await getEncountersBySpiderId(Number(id));
-          setEncounters(spiderEncounters);
+          try {
+            const spiderEncounters = await getEncountersBySpiderId(Number(id));
+            setEncounters(spiderEncounters);
+          } catch (error) {
+            console.error("Error fetching encounters:", error);
+          }
         }
       }
     };
@@ -70,48 +75,50 @@ const SpiderDetails = () => {
     <div className="min-h-screen bg-spider-background">
       <NavBar />
       
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row gap-8">
+      <main className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="flex items-center mb-4">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/database')} 
+            className="mr-2"
+            size="sm"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Back
+          </Button>
+          <h1 className="text-xl sm:text-3xl font-bold text-spider-primary truncate">{spider.commonName}</h1>
+        </div>
+        
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
           {/* Spider Info */}
-          <div className="md:w-2/3">
-            <div className="flex items-center mb-4">
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/database')} 
-                className="mr-2"
-              >
-                Back to Database
-              </Button>
-              <h1 className="text-3xl font-bold text-spider-primary">{spider.commonName}</h1>
-            </div>
-            
+          <div className="w-full lg:w-2/3">
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-              <div className="relative h-64 md:h-80">
+              <div className="relative h-56 sm:h-64 md:h-80">
                 <img 
                   src={spider.imageUrl} 
                   alt={spider.commonName} 
                   className="w-full h-full object-cover"
                 />
                 <Badge 
-                  className={`${getDangerColor()} absolute top-4 right-4 text-base px-3 py-1`}
+                  className={`${getDangerColor()} absolute top-4 right-4 text-sm sm:text-base px-2 sm:px-3 py-0.5 sm:py-1`}
                 >
                   {spider.dangerLevel}
                 </Badge>
               </div>
               
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <div className="mb-4">
-                  <h2 className="text-xl font-semibold mb-2">Scientific Classification</h2>
-                  <p className="italic text-lg">{spider.scientificName}</p>
+                  <h2 className="text-lg sm:text-xl font-semibold mb-2">Scientific Classification</h2>
+                  <p className="italic text-base sm:text-lg">{spider.scientificName}</p>
                   <p>Family: {spider.family}</p>
                 </div>
                 
                 <div className="mb-4">
-                  <h2 className="text-xl font-semibold mb-2">Description</h2>
+                  <h2 className="text-lg sm:text-xl font-semibold mb-2">Description</h2>
                   <p>{spider.description}</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
                     <h3 className="font-semibold">Habitat</h3>
                     <p>{spider.habitat}</p>
@@ -144,13 +151,13 @@ const SpiderDetails = () => {
           </div>
           
           {/* Encounters Column */}
-          <div className="md:w-1/3">
+          <div className="w-full lg:w-1/3">
             <Card className="bg-white">
-              <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Your Encounters</h2>
+              <CardContent className="p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4">Your Encounters</h2>
                 
                 {encounters.length === 0 ? (
-                  <div className="text-center p-6 border border-dashed border-gray-300 rounded-lg">
+                  <div className="text-center p-4 sm:p-6 border border-dashed border-gray-300 rounded-lg">
                     <p>You haven't encountered this spider yet</p>
                     <Button 
                       onClick={() => navigate(`/log-encounter/${spider.id}`)} 
