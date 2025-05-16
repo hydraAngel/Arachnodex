@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Spider app specific colors
+				spider: {
+					primary: '#2D6A4F', // dark green
+					secondary: '#40916C', // medium green
+					accent: '#95D5B2', // light green
+					background: '#F8F9FA', // off-white
+					card: '#FFFFFF', // white
+					text: '#212529', // almost black
+					muted: '#6C757D', // gray
 				}
 			},
 			borderRadius: {
@@ -84,11 +95,16 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'web-appear': {
+					'0%': { opacity: '0', transform: 'scale(0.9)' },
+					'100%': { opacity: '1', transform: 'scale(1)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'web-appear': 'web-appear 0.3s ease-out'
 			}
 		}
 	},
