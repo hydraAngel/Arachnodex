@@ -11,7 +11,7 @@ const useSupabase = (): boolean => {
 };
 
 // Get all encounters from Supabase or local storage
-export const getAllEncounters = async (): Promise<Encounter[]> {
+export const getAllEncounters = async (): Promise<Encounter[]> => {
   if (useSupabase()) {
     try {
       const { data: currentSession } = await supabase.auth.getSession();
@@ -59,7 +59,7 @@ export const getAllEncounters = async (): Promise<Encounter[]> {
 };
 
 // Save an encounter to Supabase or local storage
-export const saveEncounter = async (encounter: Encounter): Promise<void> {
+export const saveEncounter = async (encounter: Encounter): Promise<void> => {
   if (useSupabase()) {
     try {
       const { data: currentSession } = await supabase.auth.getSession();
@@ -97,13 +97,13 @@ export const saveEncounter = async (encounter: Encounter): Promise<void> {
 };
 
 // Get encounters for a specific spider
-export const getEncountersBySpiderId = async (spiderId: number): Promise<Encounter[]> {
+export const getEncountersBySpiderId = async (spiderId: number): Promise<Encounter[]> => {
   const encounters = await getAllEncounters();
   return encounters.filter(encounter => encounter.spiderId === spiderId);
 };
 
 // Get a single encounter by its ID
-export const getEncounterById = async (id: string): Promise<Encounter | undefined> {
+export const getEncounterById = async (id: string): Promise<Encounter | undefined> => {
   if (useSupabase()) {
     try {
       const { data, error } = await supabase
@@ -139,7 +139,7 @@ export const getEncounterById = async (id: string): Promise<Encounter | undefine
 };
 
 // Delete an encounter by its ID
-export const deleteEncounter = async (id: string): Promise<void> {
+export const deleteEncounter = async (id: string): Promise<void> => {
   if (useSupabase()) {
     try {
       const { error } = await supabase
