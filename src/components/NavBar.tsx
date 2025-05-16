@@ -1,18 +1,30 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Search, LogOut, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getAllEncounters } from "@/services/encounter-service";
+import { useAuth } from "@/context/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const NavBar = () => {
   const navigate = useNavigate();
   const [encounterCount, setEncounterCount] = useState(0);
+  const { user, signOut } = useAuth();
   
   useEffect(() => {
     const encounters = getAllEncounters();
     setEncounterCount(encounters.length);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <nav className="bg-spider-primary text-white p-4 shadow-md">
@@ -26,7 +38,7 @@ const NavBar = () => {
             <span>{encounterCount} Encounters Logged</span>
           </div>
         </div>
-        <div className="flex space-x-4">
+        <div className="flex space-x-4 items-center">
           <Button 
             variant="secondary" 
             className="bg-spider-secondary hover:bg-spider-accent text-white"
@@ -56,6 +68,21 @@ const NavBar = () => {
             <Search className="h-4 w-4 mr-2" />
             Search
           </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="bg-white hover:bg-gray-100 text-spider-primary">
+                <User className="h-4 w-4 mr-2" />
+                {user?.email?.split('@')[0] || 'Account'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleSignOut} className="text-red-500 cursor-pointer">
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </nav>

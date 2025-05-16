@@ -8,21 +8,36 @@ import EncounterCard from "@/components/EncounterCard";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Search } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const EncountersList = () => {
   const [encounters, setEncounters] = useState<Encounter[]>([]);
   const [filteredEncounters, setFilteredEncounters] = useState<Encounter[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const allEncounters = getAllEncounters();
-    // Sort by date, newest first
-    const sortedEncounters = [...allEncounters].sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-    setEncounters(sortedEncounters);
-    setFilteredEncounters(sortedEncounters);
-  }, []);
+    const fetchEncounters = async () => {
+      try {
+        const allEncounters = await getAllEncounters();
+        // Sort by date, newest first
+        const sortedEncounters = [...allEncounters].sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        setEncounters(sortedEncounters);
+        setFilteredEncounters(sortedEncounters);
+      } catch (error) {
+        console.error("Failed to fetch encounters:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchEncounters();
+    }
+  }, [user]);
 
   // Filter encounters based on search query
   useEffect(() => {
@@ -89,7 +104,11 @@ const EncountersList = () => {
           </div>
         </div>
         
-        {encounters.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-spider-primary"></div>
+          </div>
+        ) : encounters.length === 0 ? (
           <div className="text-center p-8 border border-dashed border-gray-300 rounded-lg">
             <p className="text-xl text-gray-500">You haven't logged any encounters yet</p>
             <p className="text-gray-400 mt-2">Go to the spider database to start logging encounters</p>

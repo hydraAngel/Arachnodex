@@ -9,7 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      encounters: {
+        Row: {
+          companions: string[] | null
+          coordinates: Json | null
+          created_at: string
+          date: string
+          id: string
+          location: string
+          notes: string | null
+          photos: string[] | null
+          spider_id: number
+          user_id: string
+        }
+        Insert: {
+          companions?: string[] | null
+          coordinates?: Json | null
+          created_at?: string
+          date?: string
+          id?: string
+          location: string
+          notes?: string | null
+          photos?: string[] | null
+          spider_id: number
+          user_id: string
+        }
+        Update: {
+          companions?: string[] | null
+          coordinates?: Json | null
+          created_at?: string
+          date?: string
+          id?: string
+          location?: string
+          notes?: string | null
+          photos?: string[] | null
+          spider_id?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

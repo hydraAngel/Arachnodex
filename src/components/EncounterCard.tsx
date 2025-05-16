@@ -23,7 +23,7 @@ const EncounterCard: React.FC<EncounterCardProps> = ({ encounter }) => {
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <CardHeader className="p-4 pb-2 bg-spider-primary text-white">
         <CardTitle className="text-lg">{spider.commonName}</CardTitle>
-        <div className="text-sm opacity-80">{format(encounter.date, "PPP")}</div>
+        <div className="text-sm opacity-80">{format(new Date(encounter.date), "PPP")}</div>
       </CardHeader>
       <CardContent className="p-4 space-y-3">
         <div className="flex items-center text-sm">
@@ -33,7 +33,7 @@ const EncounterCard: React.FC<EncounterCardProps> = ({ encounter }) => {
         
         <div className="flex items-center text-sm">
           <CalendarIcon className="h-4 w-4 mr-2" />
-          <span>{format(encounter.date, "PPPP")}</span>
+          <span>{format(new Date(encounter.date), "PPPP")}</span>
         </div>
         
         {encounter.companions.length > 0 && (
