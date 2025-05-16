@@ -16,20 +16,34 @@ const SpiderDetails = () => {
   const navigate = useNavigate();
   const [spider, setSpider] = useState<Spider | null>(null);
   const [encounters, setEncounters] = useState<Encounter[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (id) {
-        const spiderData = getSpiderById(Number(id));
-        if (spiderData) {
-          setSpider(spiderData);
-          try {
-            const spiderEncounters = await getEncountersBySpiderId(Number(id));
-            setEncounters(spiderEncounters);
-          } catch (error) {
-            console.error("Error fetching encounters:", error);
+      setLoading(true);
+      
+      try {
+        if (id) {
+          const spiderData = await getSpiderById(Number(id));
+          if (spiderData) {
+            setSpider(spiderData);
+            
+            try {
+              const spiderEncounters = await getEncountersBySpiderId(Number(id));
+              setEncounters(spiderEncounters);
+            } catch (encounterError) {
+              console.error("Error fetching encounters:", encounterError);
+            }
+          } else {
+            setError("Spider not found");
           }
         }
+      } catch (err) {
+        console.error("Error fetching details:", err);
+        setError("Failed to load details. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     };
     
@@ -54,12 +68,23 @@ const SpiderDetails = () => {
     }
   };
 
-  if (!spider) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-spider-background">
+        <NavBar />
+        <div className="container mx-auto px-4 py-8 flex justify-center items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-spider-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !spider) {
     return (
       <div className="min-h-screen bg-spider-background">
         <NavBar />
         <div className="container mx-auto px-4 py-8 text-center">
-          <p className="text-xl">Spider not found</p>
+          <p className="text-xl text-red-500">{error || "Spider not found"}</p>
           <Button 
             onClick={() => navigate('/database')} 
             className="mt-4 bg-spider-primary hover:bg-spider-secondary"

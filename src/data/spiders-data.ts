@@ -1,7 +1,8 @@
 
-import { DangerLevel, Spider } from "../types/spider";
+import { Spider } from "@/types/spider";
+import { fetchSpidersData } from "@/services/spider-api-service";
 
-// Sample spider data
+// This is our fallback data if the API fails
 export const spidersData: Spider[] = [
   {
     id: 1,
@@ -89,20 +90,43 @@ export const spidersData: Spider[] = [
   }
 ];
 
-// Function to search through the spider database
-export const searchSpiders = (query: string): Spider[] => {
-  const lowercaseQuery = query.toLowerCase();
-  
-  return spidersData.filter(spider => 
-    spider.commonName.toLowerCase().includes(lowercaseQuery) ||
-    spider.scientificName.toLowerCase().includes(lowercaseQuery) ||
-    spider.family.toLowerCase().includes(lowercaseQuery) ||
-    spider.description.toLowerCase().includes(lowercaseQuery) ||
-    spider.habitat.toLowerCase().includes(lowercaseQuery)
-  );
+// Cache for API data
+let apiSpidersCache: Spider[] | null = null;
+
+// Function to get all spiders, preferring API data
+export const getAllSpiders = async (): Promise<Spider[]> => {
+  try {
+    // Try to get data from API if we don't have it cached
+    if (!apiSpidersCache) {
+      apiSpidersCache = await fetchSpidersData();
+    }
+    return apiSpidersCache;
+  } catch (error) {
+    console.error("Error fetching spiders from API:", error);
+    return spidersData;
+  }
 };
 
-// Function to get a spider by its ID
-export const getSpiderById = (id: number): Spider | undefined => {
-  return spidersData.find(spider => spider.id === id);
+// Function to get a spider by ID
+export const getSpiderById = async (id: number): Promise<Spider | undefined> => {
+  const allSpiders = await getAllSpiders();
+  return allSpiders.find(spider => spider.id === id);
+};
+
+// Function to search spiders based on query
+export const searchSpiders = async (query: string): Promise<Spider[]> => {
+  const allSpiders = await getAllSpiders();
+  
+  if (!query) return allSpiders;
+  
+  const lowerCaseQuery = query.toLowerCase();
+  
+  return allSpiders.filter(spider => 
+    spider.commonName.toLowerCase().includes(lowerCaseQuery) ||
+    spider.scientificName.toLowerCase().includes(lowerCaseQuery) ||
+    spider.description.toLowerCase().includes(lowerCaseQuery) ||
+    spider.habitat.toLowerCase().includes(lowerCaseQuery) ||
+    spider.family.toLowerCase().includes(lowerCaseQuery) ||
+    spider.region.some(region => region.toLowerCase().includes(lowerCaseQuery))
+  );
 };

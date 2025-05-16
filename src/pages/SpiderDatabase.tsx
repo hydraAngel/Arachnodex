@@ -1,6 +1,7 @@
 
-import { useState } from "react";
-import { spidersData, searchSpiders } from "@/data/spiders-data";
+import { useState, useEffect } from "react";
+import { getAllSpiders, searchSpiders } from "@/data/spiders-data";
+import { Spider } from "@/types/spider";
 import SpiderCard from "@/components/SpiderCard";
 import NavBar from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
@@ -9,17 +10,55 @@ import { Search } from "lucide-react";
 
 const SpiderDatabase = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredSpiders, setFilteredSpiders] = useState(spidersData);
+  const [spiders, setSpiders] = useState<Spider[]>([]);
+  const [filteredSpiders, setFilteredSpiders] = useState<Spider[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
-  const handleSearch = (e: React.FormEvent) => {
+  // Load all spiders on component mount
+  useEffect(() => {
+    const loadSpiders = async () => {
+      try {
+        setLoading(true);
+        const allSpiders = await getAllSpiders();
+        setSpiders(allSpiders);
+        setFilteredSpiders(allSpiders);
+      } catch (err) {
+        console.error("Failed to load spiders:", err);
+        setError("Failed to load spider data. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadSpiders();
+  }, []);
+  
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    const results = searchSpiders(searchQuery);
-    setFilteredSpiders(results);
+    setLoading(true);
+    try {
+      const results = await searchSpiders(searchQuery);
+      setFilteredSpiders(results);
+    } catch (err) {
+      console.error("Search error:", err);
+      setError("Failed to search. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
   
-  const handleReset = () => {
+  const handleReset = async () => {
     setSearchQuery("");
-    setFilteredSpiders(spidersData);
+    setLoading(true);
+    try {
+      const allSpiders = await getAllSpiders();
+      setFilteredSpiders(allSpiders);
+    } catch (err) {
+      console.error("Reset error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,7 +99,21 @@ const SpiderDatabase = () => {
           </div>
         </form>
         
-        {filteredSpiders.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-spider-primary"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center p-6 sm:p-8 border border-dashed border-gray-300 rounded-lg">
+            <p className="text-lg sm:text-xl text-red-500">{error}</p>
+            <Button 
+              onClick={handleReset} 
+              className="mt-4 bg-spider-primary hover:bg-spider-secondary"
+            >
+              Try Again
+            </Button>
+          </div>
+        ) : filteredSpiders.length === 0 ? (
           <div className="text-center p-6 sm:p-8 border border-dashed border-gray-300 rounded-lg">
             <p className="text-lg sm:text-xl text-gray-500">No spiders found matching "{searchQuery}"</p>
             <Button 
